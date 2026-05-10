@@ -1,15 +1,23 @@
+import { serverConfig } from "../config"
+import { redlock } from "../config/redis.config"
 import { createBookingDto } from "../dto/booking.dto"
 import { prisma } from "../prisma/client"
 import { confirmBooking, createBooking, createIdempotencyKey, finalizeIdempotencyKey, getIdempotencyKey } from "../repositories/Booking.repository"
-import { BadRequestError, NotFoundError } from "../utils/errors/app.error"
+import { BadRequestError, InternalServerError, NotFoundError } from "../utils/errors/app.error"
 import { generateIdempotencyKey } from "../utils/generateIdempotencyKey"
 
 
 
 export async function createBookingService(createBookingData:createBookingDto 
-){
-    console.log("Hello")
-    const booking=await createBooking({
+){ 
+    const ttl=serverConfig.LOCK_TTL
+    const bookingResource=`hotel:${createBookingData.hotelId}`
+
+    let lock;
+     try{
+    lock=await redlock.acquire([bookingResource],ttl)
+        console.log(`requiring lock for the resource: ${bookingResource} with TTL: ${ttl}, lock:${lock}`)
+        const booking=await createBooking({
         userId:createBookingData.userId,
         hotelId:createBookingData.hotelId,
         bookingAmount:createBookingData.bookingAmount,
@@ -25,6 +33,11 @@ export async function createBookingService(createBookingData:createBookingDto
         idempotencyKey:idempotencyKey
     }
     
+     }catch(error){
+        throw new InternalServerError("Can not lock the resource")
+     }
+    
+   
 }
 
 export async function confirmBookingService(idempotencnyKey:string){
