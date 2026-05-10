@@ -51,7 +51,8 @@ export const AnyNull = runtime.AnyNull
 
 
 export const ModelName = {
-  Booking: 'Booking'
+  Booking: 'Booking',
+  IdempotencyKey: 'IdempotencyKey'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -84,10 +85,29 @@ export const BookingScalarFieldEnum = {
 export type BookingScalarFieldEnum = (typeof BookingScalarFieldEnum)[keyof typeof BookingScalarFieldEnum]
 
 
+export const IdempotencyKeyScalarFieldEnum = {
+  id: 'id',
+  key: 'key',
+  createdAt: 'createdAt',
+  updateAt: 'updateAt',
+  finalized: 'finalized',
+  bookingId: 'bookingId'
+} as const
+
+export type IdempotencyKeyScalarFieldEnum = (typeof IdempotencyKeyScalarFieldEnum)[keyof typeof IdempotencyKeyScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
 } as const
 
 export type SortOrder = (typeof SortOrder)[keyof typeof SortOrder]
+
+
+export const IdempotencyKeyOrderByRelevanceFieldEnum = {
+  key: 'key'
+} as const
+
+export type IdempotencyKeyOrderByRelevanceFieldEnum = (typeof IdempotencyKeyOrderByRelevanceFieldEnum)[keyof typeof IdempotencyKeyOrderByRelevanceFieldEnum]
 
