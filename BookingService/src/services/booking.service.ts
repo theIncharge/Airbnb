@@ -32,7 +32,7 @@ export async function confirmBookingService(idempotencnyKey:string){
     return await prisma.$transaction(async (tx)=>{
         const idempotencyKeyData=await getIdempotencyKey(tx,idempotencnyKey)
 
-     if(!idempotencyKeyData){
+     if(!idempotencyKeyData || !idempotencyKeyData.bookingId){
         throw  new NotFoundError("Idempotency Key Not Found")
 
 
@@ -42,8 +42,8 @@ export async function confirmBookingService(idempotencnyKey:string){
         throw new BadRequestError("Idem;otency Key Already Finalized")
      }
 
-     const booking=await confirmBooking(idempotencyKeyData.bookingId)
-     await finalizeIdempotencyKey(idempotencyKeyData.key)
+     const booking=await confirmBooking(tx,idempotencyKeyData.bookingId)
+     await finalizeIdempotencyKey(tx,idempotencyKeyData.idemKey)
      return booking
 
     })
