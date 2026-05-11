@@ -4,7 +4,31 @@ import { serverConfig } from '.'
 
 const redisClient=new IORedis(serverConfig.REDIS_SERVER_URL)
 
-const redlock= new Redlock([redisClient as any],{
+
+
+
+
+function connectToRedis(){
+    let connection:IORedis;
+   
+
+
+    return ()=>{
+        if(!connection){
+            connection=new IORedis(serverConfig.REDIS_SERVER_URL)
+        }
+        return connection
+    }
+}
+
+
+export const getRedisConnObject=connectToRedis()
+
+
+
+
+
+const redlock= new Redlock([getRedisConnObject() as any],{
     retryCount:10,
     retryDelay:200,
     retryJitter:200,
