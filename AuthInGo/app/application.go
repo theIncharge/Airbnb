@@ -1,6 +1,11 @@
 package app
 
 import (
+	config "AuthInGo/config/env"
+	"AuthInGo/controllers"
+	db "AuthInGo/db/repositories"
+	"AuthInGo/router"
+	"AuthInGo/services"
 	"fmt"
 	"net/http"
 	"time"
@@ -11,26 +16,34 @@ type Config struct {
 }
 
 type Application struct {
-	Config Config
+	Config  Config
+	Storage db.Storage
 }
 
 func NewConfig(addr string) Config {
+	port := config.GetString("PORT", ":8080")
 	return Config{
-		Addr: addr,
+		Addr: port,
 	}
 }
 
 func NewApplication(cfg Config) *Application {
 	return &Application{
-		Config: cfg,
+		Config:  cfg,
+		Storage: *db.NewStorage(),
 	}
 }
 
 func (app *Application) Run() error {
 
+	ur := db.NewUserRepository()
+	us := services.NewUserService(ur)
+	uc := controllers.NewUserController(us)
+	uRouter := router.NewUserRouter(uc)
+
 	server := http.Server{
 		Addr:         app.Config.Addr,
-		Handler:      nil,
+		Handler:      router.SetUpRouter(uRouter),
 		ReadTimeout:  10 * time.Second,
 		WriteTimeout: 10 * time.Second,
 	}
