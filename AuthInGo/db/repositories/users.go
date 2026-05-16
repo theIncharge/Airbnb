@@ -9,6 +9,7 @@ import (
 type UserRepository interface {
 	GetById() (*models.User, error)
 	Create(username string, email string, hashedPassword string) error
+	GetByEmail(email string) (*models.User, error)
 }
 
 type UserRepositoryImpl struct {
@@ -70,4 +71,25 @@ func (u *UserRepositoryImpl) Create(username string, email string, hashedPasswor
 
 	return nil
 
+}
+
+func (u *UserRepositoryImpl) GetByEmail(email string) (*models.User, error) {
+
+	query := `SELECT id,email,password FROM users where email =?`
+
+	row := u.db.QueryRow(query, email)
+
+	user := &models.User{}
+	err := row.Scan(&user.Id, &user.Email, &user.Password)
+
+	if err != nil {
+		if err == sql.ErrNoRows {
+			fmt.Println("No such user exists")
+			return nil, err
+		}
+		fmt.Println("Error querying database")
+		return nil, err
+	}
+
+	return user, nil
 }
