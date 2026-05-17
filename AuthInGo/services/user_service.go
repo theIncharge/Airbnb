@@ -3,6 +3,8 @@ package services
 import (
 	env "AuthInGo/config/env"
 	db "AuthInGo/db/repositories"
+	"AuthInGo/dto"
+	"AuthInGo/models"
 	"AuthInGo/utils"
 	"fmt"
 
@@ -10,17 +12,12 @@ import (
 )
 
 type UserService interface {
-	GetUserById() error
-	CreateUser() error
-	LoginUser() (string, error)
+	LoginUser(payload *dto.LoginUserRequestDto) (string, error)
+	GetUserById(id string) (*models.User, error)
+	CreateUser(payload *dto.CreateUserRequestDto) (*models.User, error)
 }
 type UserServiceImpl struct {
 	UserRepoistory db.UserRepository
-}
-
-func (u *UserServiceImpl) GetUserById() error {
-	fmt.Println("Creating user in user service")
-	return nil
 }
 
 func NewUserService(_userRepository db.UserRepository) UserService {
@@ -29,28 +26,32 @@ func NewUserService(_userRepository db.UserRepository) UserService {
 	}
 }
 
-func (u *UserServiceImpl) CreateUser() error {
+func (u *UserServiceImpl) CreateUser(payload *dto.CreateUserRequestDto) (*models.User, error) {
 
 	fmt.Println("Creating user in user service")
-	password := "example_password"
+	password := payload.Password
 	hashedPassword, err := utils.HashPassword(password)
 	if err != nil {
 		fmt.Println(`Error hashing password`)
-		return err
+		return nil, err
 	}
-	u.UserRepoistory.Create(
-		"username1_example",
-		"user1@example.com",
+	user, err := u.UserRepoistory.Create(
+		payload.Username,
+		payload.Email,
 		hashedPassword,
 	)
-	return nil
+	if err != nil {
+		fmt.Println("Error creating the password: ", err)
+		return nil, err
+	}
+	return user, nil
 
 }
 
-func (u *UserServiceImpl) LoginUser() (string, error) {
+func (u *UserServiceImpl) LoginUser(payload *dto.LoginUserRequestDto) (string, error) {
 
-	email := "user1@example.com"
-	password := "example_password"
+	email := payload.Email
+	password := payload.Password
 
 	user, err := u.UserRepoistory.GetByEmail(email)
 	if err != nil {
@@ -71,12 +72,12 @@ func (u *UserServiceImpl) LoginUser() (string, error) {
 
 	fmt.Println("User Logged in successfully. JWT token will be printed here")
 
-	payload := jwt.MapClaims{
+	jwtPayload := jwt.MapClaims{
 		"email": user.Email,
 		"id":    user.Id,
 	}
 
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, payload)
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwtPayload)
 
 	fmt.Println("Token before signing : ", token)
 	key := env.GetString("JWT_SECRET", "root")
@@ -90,4 +91,13 @@ func (u *UserServiceImpl) LoginUser() (string, error) {
 	fmt.Println("JWT Token: ", tokenString)
 	return tokenString, nil
 
+}
+
+func (u *UserServiceImpl) GetUserById(id string) (*models.User, error) {
+	user, err := u.UserRepoistory.GetById(id)
+	if err != nil {
+		fmt.Println("Error fetching user: ", err)
+		return nil, err
+	}
+	return user, nil
 }
