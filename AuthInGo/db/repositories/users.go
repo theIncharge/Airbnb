@@ -31,7 +31,11 @@ func (u *UserRepositoryImpl) GetById(id string) (*models.User, error) {
 	query := "SELECT id, username, email, created_at, updated_at FROM users WHERE id = ?"
 
 	// Step 2: Execute the query
+
+	fmt.Println(id, "  <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<")
+
 	row := u.db.QueryRow(query, id)
+	fmt.Println(".....................................>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
 
 	// Step 3: Process the result
 	user := &models.User{}
