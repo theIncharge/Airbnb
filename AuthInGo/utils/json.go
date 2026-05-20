@@ -38,7 +38,7 @@ func WriteJsonErrorResponse(w http.ResponseWriter, status int, message string, e
 	WriteJsonResponse(w, status, response)
 }
 
-func ReadJsonRequest(r *http.Request, result any) error {
+func ReadJsonBody(r *http.Request, result any) error {
 	decoder := json.NewDecoder(r.Body)
 	decoder.DisallowUnknownFields()
 	return decoder.Decode(result)

@@ -3,24 +3,22 @@ package router
 import (
 	"AuthInGo/controllers"
 	"AuthInGo/middlewares"
-	"fmt"
 
 	"github.com/go-chi/chi"
 )
 
 type UserRouter struct {
-	UserController *controllers.UserController
+	userController *controllers.UserController
 }
 
-func NewUserRouter(_userController *controllers.UserController) *UserRouter {
+func NewUserRouter(_userController *controllers.UserController) Router {
 	return &UserRouter{
-		UserController: _userController,
+		userController: _userController,
 	}
 }
-func (ur *UserRouter) Register(r chi.Router) {
-	fmt.Println("Setting up use router")
 
-	r.With(middlewares.JWTAuthMiddleware).Get("/profile", ur.UserController.GetUserById)
-	r.With(middlewares.UserCreateRequestValidator).Post("/signup", ur.UserController.CreateUser)
-	r.With(middlewares.UserLoginRequestValidator).Post("/login", ur.UserController.LoginUser)
+func (ur *UserRouter) Register(r chi.Router) {
+	r.With(middlewares.JWTAuthMiddleware, middlewares.RequireAnyRole("user", "admin")).Get("/profile", ur.userController.GetUserById)
+	r.With(middlewares.UserCreateRequestValidator).Post("/signup", ur.userController.CreateUser)
+	r.With(middlewares.UserLoginRequestValidator).Post("/login", ur.userController.LoginUser)
 }
