@@ -12,24 +12,23 @@ func UserLoginRequestValidator(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		var payload dto.LoginUserRequestDto
 
-		err := utils.ReadJsonRequest(r, &payload)
-
-		if err != nil {
+		// Read and decode the JSON body into the payload
+		if err := utils.ReadJsonBody(r, &payload); err != nil {
 			utils.WriteJsonErrorResponse(w, http.StatusBadRequest, "Invalid request body", err)
 			return
 		}
 
+		// Validate the payload using the Validator instance
 		if err := utils.Validator.Struct(payload); err != nil {
-			utils.WriteJsonErrorResponse(w, http.StatusBadRequest, "Invalid payload", err)
+			utils.WriteJsonErrorResponse(w, http.StatusBadRequest, "Validation failed", err)
 			return
 		}
-		fmt.Println("Payload recieved for Login request: ", payload)
 
-		reqContext := r.Context()
+		fmt.Println("Payload received for login:", payload)
 
-		ctx := context.WithValue(reqContext, "payload", payload)
+		ctx := context.WithValue(r.Context(), "payload", payload) // Create a new context with the payload
 
-		next.ServeHTTP(w, r.WithContext(ctx))
+		next.ServeHTTP(w, r.WithContext(ctx)) // Call the next handler in the chain
 	})
 }
 
@@ -37,22 +36,107 @@ func UserCreateRequestValidator(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		var payload dto.CreateUserRequestDto
 
-		err := utils.ReadJsonRequest(r, &payload)
-
-		if err != nil {
+		// Read and decode the JSON body into the payload
+		if err := utils.ReadJsonBody(r, &payload); err != nil {
 			utils.WriteJsonErrorResponse(w, http.StatusBadRequest, "Invalid request body", err)
 			return
 		}
 
+		// Validate the payload using the Validator instance
 		if err := utils.Validator.Struct(payload); err != nil {
-			utils.WriteJsonErrorResponse(w, http.StatusBadRequest, "Invalid payload", err)
+			utils.WriteJsonErrorResponse(w, http.StatusBadRequest, "Validation failed", err)
 			return
 		}
-		fmt.Println("Payload recieved for Create User request: ", payload)
 
-		reqContext := r.Context()
+		ctx := context.WithValue(r.Context(), "payload", payload)
 
-		ctx := context.WithValue(reqContext, "payload", payload)
+		next.ServeHTTP(w, r.WithContext(ctx)) // Call the next handler in the chain
+	})
+}
+
+func CreateRoleRequestValidator(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		var payload dto.CreateRoleRequestDTO
+
+		// Read and decode the JSON body into the payload
+		if err := utils.ReadJsonBody(r, &payload); err != nil {
+			utils.WriteJsonErrorResponse(w, http.StatusBadRequest, "Invalid request body", err)
+			return
+		}
+
+		// Validate the payload using the Validator instance
+		if err := utils.Validator.Struct(payload); err != nil {
+			utils.WriteJsonErrorResponse(w, http.StatusBadRequest, "Validation failed", err)
+			return
+		}
+
+		ctx := context.WithValue(r.Context(), "payload", payload)
+
+		next.ServeHTTP(w, r.WithContext(ctx))
+	})
+}
+
+func UpdateRoleRequestValidator(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		var payload dto.UpdateRoleRequestDTO
+
+		// Read and decode the JSON body into the payload
+		if err := utils.ReadJsonBody(r, &payload); err != nil {
+			utils.WriteJsonErrorResponse(w, http.StatusBadRequest, "Invalid request body", err)
+			return
+		}
+
+		// Validate the payload using the Validator instance
+		if err := utils.Validator.Struct(payload); err != nil {
+			utils.WriteJsonErrorResponse(w, http.StatusBadRequest, "Validation failed", err)
+			return
+		}
+
+		ctx := context.WithValue(r.Context(), "payload", payload)
+
+		next.ServeHTTP(w, r.WithContext(ctx))
+	})
+}
+
+func AssignPermissionRequestValidator(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		var payload dto.AssignPermissionRequestDTO
+
+		// Read and decode the JSON body into the payload
+		if err := utils.ReadJsonBody(r, &payload); err != nil {
+			utils.WriteJsonErrorResponse(w, http.StatusBadRequest, "Invalid request body", err)
+			return
+		}
+
+		// Validate the payload using the Validator instance
+		if err := utils.Validator.Struct(payload); err != nil {
+			utils.WriteJsonErrorResponse(w, http.StatusBadRequest, "Validation failed", err)
+			return
+		}
+
+		ctx := context.WithValue(r.Context(), "payload", payload)
+
+		next.ServeHTTP(w, r.WithContext(ctx))
+	})
+}
+
+func RemovePermissionRequestValidator(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		var payload dto.RemovePermissionRequestDTO
+
+		// Read and decode the JSON body into the payload
+		if err := utils.ReadJsonBody(r, &payload); err != nil {
+			utils.WriteJsonErrorResponse(w, http.StatusBadRequest, "Invalid request body", err)
+			return
+		}
+
+		// Validate the payload using the Validator instance
+		if err := utils.Validator.Struct(payload); err != nil {
+			utils.WriteJsonErrorResponse(w, http.StatusBadRequest, "Validation failed", err)
+			return
+		}
+
+		ctx := context.WithValue(r.Context(), "payload", payload)
 
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
