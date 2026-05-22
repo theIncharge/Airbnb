@@ -75,8 +75,11 @@ export const BookingScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
   hotelId: 'hotelId',
+  checkInDate: 'checkInDate',
+  checkOutDate: 'checkOutDate',
+  roomCategoryId: 'roomCategoryId',
   createdAt: 'createdAt',
-  updateAt: 'updateAt',
+  updatedAt: 'updatedAt',
   bookingAmount: 'bookingAmount',
   status: 'status',
   totalGuests: 'totalGuests'
@@ -89,7 +92,7 @@ export const IdempotencyKeyScalarFieldEnum = {
   id: 'id',
   idemKey: 'idemKey',
   createdAt: 'createdAt',
-  updateAt: 'updateAt',
+  updatedAt: 'updatedAt',
   finalized: 'finalized',
   bookingId: 'bookingId'
 } as const

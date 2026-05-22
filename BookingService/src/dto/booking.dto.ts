@@ -1,6 +1,9 @@
-export type createBookingDto={
-     userId:number,
-    hotelId:number,
-    bookingAmount:number,
-    totalGuests:number
+export type CreateBookingDto = {
+    userId: number;
+    hotelId: number;
+    checkInDate: string; // ISO date string
+    checkOutDate: string; // ISO date string
+    totalGuests: number;
+    roomCategoryId:number
+    bookingAmount:number
 }
